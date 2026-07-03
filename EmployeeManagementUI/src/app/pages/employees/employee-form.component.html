@@ -1,0 +1,79 @@
+<div class="modal fade show d-block" style="background: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content fade-in-up">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ employee ? 'Edit Employee' : 'Add New Employee' }}</h5>
+        <button type="button" class="btn-close" (click)="close.emit()" [disabled]="loading()"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div *ngIf="error()" class="alert alert-danger mb-4">{{ error() }}</div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name *</label>
+              <input type="text" class="form-control" formControlName="firstName">
+              <small class="text-danger" *ngIf="form.controls.firstName.touched && form.controls.firstName.invalid">Required</small>
+            </div>
+            
+            <div class="col-md-6">
+              <label class="form-label">Last Name *</label>
+              <input type="text" class="form-control" formControlName="lastName">
+              <small class="text-danger" *ngIf="form.controls.lastName.touched && form.controls.lastName.invalid">Required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Email Address *</label>
+              <input type="email" class="form-control" formControlName="email">
+              <small class="text-danger" *ngIf="form.controls.email.touched && form.controls.email.invalid">Valid email required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input type="text" class="form-control" formControlName="phone">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Position *</label>
+              <input type="text" class="form-control" formControlName="position">
+              <small class="text-danger" *ngIf="form.controls.position.touched && form.controls.position.invalid">Required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Department *</label>
+              <select class="form-select" formControlName="departmentId">
+                <option value="" disabled>Select Department...</option>
+                <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+              </select>
+              <small class="text-danger" *ngIf="form.controls.departmentId.touched && form.controls.departmentId.invalid">Required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Salary *</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" formControlName="salary">
+              </div>
+              <small class="text-danger" *ngIf="form.controls.salary.touched && form.controls.salary.invalid">Required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Hire Date *</label>
+              <input type="date" class="form-control" formControlName="hireDate">
+              <small class="text-danger" *ngIf="form.controls.hireDate.touched && form.controls.hireDate.invalid">Required</small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" (click)="close.emit()" [disabled]="loading()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="loading()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          {{ employee ? 'Update' : 'Save' }} Employee
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

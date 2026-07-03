@@ -1,0 +1,35 @@
+<div class="modal fade show d-block" style="background: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content fade-in-up">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ department ? 'Edit Department' : 'New Department' }}</h5>
+        <button type="button" class="btn-close" (click)="close.emit()" [disabled]="loading()"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div *ngIf="error()" class="alert alert-danger mb-4">{{ error() }}</div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-3">
+            <label class="form-label">Department Name *</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="e.g. Engineering">
+            <small class="text-danger" *ngIf="form.controls.name.touched && form.controls.name.invalid">Required</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="3" placeholder="What does this department do?"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" (click)="close.emit()" [disabled]="loading()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="loading()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          {{ department ? 'Update' : 'Save' }} Department
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon mb-2">
+        <!-- PersonAdd Icon -->
+        <span class="material-symbols-rounded" style="font-size: 40px;">person_add</span>
+      </div>
+      <h2>Join the Network</h2>
+    </div>
+
+    <!-- Feedback Alerts -->
+    <div *ngIf="error()" class="alert alert-danger mb-4 fade-in px-3 py-2 text-sm rounded bg-danger bg-opacity-10 border border-danger text-light">
+      <span class="material-symbols-rounded me-2" style="vertical-align: text-bottom;">warning</span> {{ error() }}
+    </div>
+    <div *ngIf="success()" class="alert alert-success mb-4 fade-in px-3 py-2 text-sm rounded bg-success bg-opacity-10 border border-success text-light">
+      <span class="material-symbols-rounded me-2" style="vertical-align: text-bottom;">check_circle</span> {{ success() }}
+    </div>
+
+    <form *ngIf="!success()" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off">
+      <div class="row">
+        <!-- Account Details Column -->
+        <div class="col-md-6 pe-md-4 border-end-md">
+          <h5 class="section-title mb-4">Account Details</h5>
+          
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <div class="input-group" [class.is-invalid]="form.get('username')?.touched && form.get('username')?.invalid">
+              <span class="input-group-text">
+                <span class="material-symbols-rounded" style="font-size: 20px;">person</span>
+              </span>
+              <input type="text" class="form-control" formControlName="username" placeholder="Username" autocomplete="new-password">
+            </div>
+            <div class="text-danger small mt-1" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
+              Username is required (min 3 chars).
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <div class="input-group" [class.is-invalid]="form.get('email')?.touched && form.get('email')?.invalid">
+              <span class="input-group-text">
+                <span class="material-symbols-rounded" style="font-size: 20px;">mail</span>
+              </span>
+              <input type="email" class="form-control" formControlName="email" placeholder="Email Address" autocomplete="new-password">
+            </div>
+            <div class="text-danger small mt-1" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+              Valid email is required.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Password</label>
+            <div class="input-group" [class.is-invalid]="form.get('password')?.touched && form.get('password')?.invalid">
+              <span class="input-group-text">
+                <span class="material-symbols-rounded" style="font-size: 20px;">lock</span>
+              </span>
+              <input [type]="showPass() ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="••••••••" autocomplete="new-password">
+              <button type="button" class="input-group-text btn p-0 px-3 m-0" (click)="showPass.set(!showPass())">
+                <span *ngIf="!showPass()" class="material-symbols-rounded" style="font-size: 20px;">visibility_off</span>
+                <span *ngIf="showPass()" class="material-symbols-rounded" style="font-size: 20px;">visibility</span>
+              </button>
+            </div>
+            
+            <div class="strength-meter mt-2" *ngIf="form.get('password')?.value">
+              <div class="strength-bar-container">
+                <div class="strength-bar" [class]="'strength-' + passwordStrength()"></div>
+              </div>
+              <div class="strength-text d-flex justify-content-between align-items-center mt-1">
+                <span>Security Level:</span>
+                <span class="fw-bold" [class]="'text-strength-' + passwordStrength()">{{ strengthLabel() }}</span>
+              </div>
+            </div>
+
+            <div class="text-danger small mt-1" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+              Password is required (min 6 chars).
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Access Level Request</label>
+            <div class="role-switch mb-0">
+              <div class="role-option">
+                <input type="radio" id="role-employee" formControlName="requestedRole" value="Employee">
+                <label for="role-employee"><span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">work</span> Employee</label>
+              </div>
+              <div class="role-option">
+                <input type="radio" id="role-admin" formControlName="requestedRole" value="Admin">
+                <label for="role-admin"><span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">admin_panel_settings</span> Admin</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Profile Column -->
+        <div class="col-md-6 ps-md-4 mt-4 mt-md-0">
+          <h5 class="section-title mb-4">Professional Profile</h5>
+          
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">First Name</label>
+              <div class="input-group" [class.is-invalid]="form.get('firstName')?.touched && form.get('firstName')?.invalid">
+                <input type="text" class="form-control ps-3 border-radius-start" formControlName="firstName" placeholder="First Name">
+              </div>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">Last Name</label>
+              <div class="input-group" [class.is-invalid]="form.get('lastName')?.touched && form.get('lastName')?.invalid">
+                <input type="text" class="form-control ps-3 border-radius-start" formControlName="lastName" placeholder="Last Name">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <div class="input-group" [class.is-invalid]="form.get('phone')?.touched && form.get('phone')?.invalid">
+              <span class="input-group-text"><span class="material-symbols-rounded" style="font-size: 20px;">call</span></span>
+              <input type="text" class="form-control" formControlName="phone" placeholder="+91">
+            </div>
+          </div>
+
+          <div class="mb-3">
+             <label class="form-label">Job Position</label>
+             <div class="input-group" [class.is-invalid]="form.get('position')?.touched && form.get('position')?.invalid">
+                <span class="input-group-text"><span class="material-symbols-rounded" style="font-size: 20px;">badge</span></span>
+                <input type="text" class="form-control" formControlName="position" placeholder="e.g. Software Engineer">
+             </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Department</label>
+            <div class="input-group" [class.is-invalid]="form.get('departmentId')?.touched && form.get('departmentId')?.invalid">
+              <span class="input-group-text"><span class="material-symbols-rounded" style="font-size: 20px;">corporate_fare</span></span>
+              <select class="form-control form-select custom-select" formControlName="departmentId">
+                <option value="" disabled selected>Select Department</option>
+                <option *ngFor="let dept of departments()" [value]="dept.id">{{ dept.name }} (Team Size: {{ dept.employeeCount || 0 }})</option>
+              </select>
+            </div>
+            <div class="text-danger small mt-1" *ngIf="form.get('departmentId')?.touched && form.get('departmentId')?.invalid">
+              Department is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-top-subtle">
+        <button type="submit" class="auth-btn" [disabled]="loading()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          <span>{{ loading() ? 'Registering Profile...' : 'Complete Registration' }}</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="auth-link">
+      Already have an account? <a routerLink="/login">Sign In</a>
+    </div>
+  </div>
+</div>

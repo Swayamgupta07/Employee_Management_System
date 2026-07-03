@@ -1,0 +1,150 @@
+<!-- Page header -->
+<div class="page-header stagger">
+  <div>
+    <h2 class="page-title fade-in-up">Employees</h2>
+    <p class="page-subtitle fade-in-up" style="animation-delay: 0.1s">Manage your company's workforce</p>
+  </div>
+  <button *ngIf="canEdit" class="btn btn-primary fade-in-up" (click)="openCreateModal()" style="animation-delay: 0.1s">
+    <span class="fs-5">+</span> Add Employee
+  </button>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 fade-in-up" style="animation-delay: 0.2s">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Search Name</label>
+        <div class="search-box">
+          <span class="search-icon"><span class="material-symbols-rounded">search</span></span>
+          <input type="text" class="form-control" placeholder="John Doe" [(ngModel)]="searchName" (keyup.enter)="onSearch()">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Search Email</label>
+        <div class="search-box">
+          <span class="search-icon"><span class="material-symbols-rounded">mail</span></span>
+          <input type="text" class="form-control" placeholder="john@company.com" [(ngModel)]="searchEmail" (keyup.enter)="onSearch()">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Department</label>
+        <select class="form-select" [(ngModel)]="searchDept" (change)="onSearch()">
+          <option value="">All Departments</option>
+          <option *ngFor="let d of departments()" [value]="d.id">{{ d.name }}</option>
+        </select>
+      </div>
+      <div class="col-md-3 d-flex gap-2">
+        <button class="btn btn-primary flex-grow-1" (click)="onSearch()">Search</button>
+        <button class="btn btn-secondary" (click)="resetSearch()">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading()" class="spinner-overlay">
+  <div class="spinner-border" role="status"></div>
+</div>
+
+<!-- Table -->
+<div *ngIf="!loading()" class="table-card fade-in-up" style="animation-delay: 0.3s">
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Contact</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th *ngIf="canEdit" class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of employees()">
+          <!-- Employee column -->
+          <td>
+            <div style="display:flex;align-items:center;gap:12px">
+              <!-- Avatar: real pic OR initials -->
+              <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#7B61FF,#00C9A7);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:0.82rem;">
+                <img *ngIf="emp.profilePictureUrl" [src]="emp.profilePictureUrl" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">
+                <span *ngIf="!emp.profilePictureUrl">{{ emp.firstName[0] }}{{ emp.lastName[0] }}</span>
+              </div>
+              <!-- Name + admin-only meta -->
+              <div>
+                <div style="font-weight:600;font-size:0.875rem;color:#F0F4FF;">{{ emp.firstName }} {{ emp.lastName }}</div>
+                <div *ngIf="canEdit" style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+                  <span style="color:#00C9A7;background:rgba(0,201,167,0.12);border-radius:4px;padding:1px 7px;font-size:0.71rem;font-weight:700;font-family:monospace;">EMP-{{ emp.id.toString().padStart(4, '0') }}</span>
+                  <span style="color:#4B5563;font-size:0.7rem;">·</span>
+                  <span style="color:#94A3B8;font-size:0.71rem;">{{ emp.phone || 'No phone' }}</span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <!-- Contact -->
+          <td style="color:#94A3B8;font-size:0.82rem;">{{ emp.email }}</td>
+          <td style="color:#94A3B8">{{ emp.position }}</td>
+          <td><span class="badge badge-dept">{{ emp.departmentName || 'N/A' }}</span></td>
+          <td>
+            <span class="badge" [class.badge-active]="emp.isActive" [class.badge-inactive]="!emp.isActive">
+              {{ emp.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td *ngIf="canEdit" class="text-end">
+            <button class="btn btn-sm btn-icon me-1" style="color:#00C9A7" (click)="openEditModal(emp)">
+              <span class="material-symbols-rounded" style="font-size:18px">edit</span>
+            </button>
+            <button *ngIf="emp.isActive" class="btn btn-sm btn-icon me-1" style="color:#F59E0B" (click)="deactivate(emp.id)">
+              <span class="material-symbols-rounded" style="font-size:18px">block</span>
+            </button>
+            <button class="btn btn-sm btn-icon" style="color:#EF4444" (click)="delete(emp.id)">
+              <span class="material-symbols-rounded" style="font-size:18px">delete</span>
+            </button>
+          </td>
+        </tr>
+        
+        <tr *ngIf="employees().length === 0">
+          <td [attr.colspan]="canEdit ? 6 : 5">
+            <div class="empty-state">
+              <div class="empty-state-icon"><span class="material-symbols-rounded" style="font-size:48px">groups</span></div>
+              <h5>No employees found</h5>
+              <p>Try adjusting your search criteria or add a new employee.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Pagination — same dark background as table card -->
+  <div *ngIf="employees().length > 0"
+       style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#1A2233;border-top:1px solid rgba(255,255,255,0.06);">
+    <span style="font-size:0.8rem;color:#4B5563;">
+      Showing page {{ pageNumber() }} of {{ Math.ceil(totalRecords() / pageSize()) || 1 }} ({{ totalRecords() }} total)
+    </span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button (click)="changePage(-1)" [disabled]="pageNumber() === 1"
+              style="display:flex;align-items:center;gap:4px;padding:6px 14px;background:#212C3F;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#94A3B8;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:inherit;"
+              [style.opacity]="pageNumber() === 1 ? '0.4' : '1'">
+        <span class="material-symbols-rounded" style="font-size:16px">chevron_left</span> Previous
+      </button>
+      <span style="min-width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#00C9A7;color:#fff;font-weight:700;font-size:0.82rem;border-radius:8px;">
+        {{ pageNumber() }}
+      </span>
+      <button (click)="changePage(1)" [disabled]="pageNumber() >= Math.ceil(totalRecords() / pageSize())"
+              style="display:flex;align-items:center;gap:4px;padding:6px 14px;background:#212C3F;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#94A3B8;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:inherit;"
+              [style.opacity]="pageNumber() >= Math.ceil(totalRecords() / pageSize()) ? '0.4' : '1'">
+        Next <span class="material-symbols-rounded" style="font-size:16px">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal component -->
+<app-employee-form 
+  *ngIf="showModal()" 
+  [employee]="selectedEmployee()" 
+  [departments]="departments()"
+  (close)="closeModal()" 
+  (saved)="onSaved()">
+</app-employee-form>

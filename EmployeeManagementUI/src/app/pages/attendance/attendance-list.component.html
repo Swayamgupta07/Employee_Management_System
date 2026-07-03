@@ -1,0 +1,122 @@
+<div class="page-header stagger">
+  <div>
+    <h2 class="page-title fade-in-up">Attendance</h2>
+    <p class="page-subtitle fade-in-up" style="animation-delay: 0.1s">Track employee check-ins and check-outs</p>
+  </div>
+  <button *ngIf="canEdit" class="btn btn-primary fade-in-up" style="animation-delay: 0.1s" (click)="openCreateModal()">
+    <span class="fs-5">+</span> Log Attendance
+  </button>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 fade-in-up" style="animation-delay: 0.2s">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      
+      <div class="col-md-3">
+        <label class="form-label">Filter By</label>
+        <select class="form-select" [(ngModel)]="filterType" (change)="loadData()">
+          <option value="month">Monthly Report</option>
+          <option value="date">Date Range</option>
+          <option value="employee">Specific Employee</option>
+          <option value="all">All Records</option>
+        </select>
+      </div>
+
+      <!-- Monthly Filters -->
+      <ng-container *ngIf="filterType() === 'month'">
+        <div class="col-md-3">
+          <label class="form-label">Month (1-12)</label>
+          <input type="number" class="form-control" [(ngModel)]="monthInput" min="1" max="12">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Year</label>
+          <input type="number" class="form-control" [(ngModel)]="yearInput" min="2000">
+        </div>
+      </ng-container>
+
+      <!-- Date Range Filters -->
+      <ng-container *ngIf="filterType() === 'date'">
+        <div class="col-md-3">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="startDateInput">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control" [(ngModel)]="endDateInput">
+        </div>
+      </ng-container>
+
+      <!-- Employee Filters -->
+      <ng-container *ngIf="filterType() === 'employee'">
+        <div class="col-md-6">
+          <label class="form-label">Employee ID</label>
+          <div class="search-box">
+            <span class="search-icon">#</span>
+            <input type="number" class="form-control" placeholder="123" [(ngModel)]="empIdInput" (keyup.enter)="loadData()">
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="col-md-3 d-flex gap-2">
+        <button class="btn btn-primary flex-grow-1" (click)="loadData()">Apply Filter</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading()" class="spinner-overlay">
+  <div class="spinner-border" role="status"></div>
+</div>
+
+<div *ngIf="!loading()" class="table-card fade-in-up" style="animation-delay: 0.3s">
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Employee ID</th>
+          <th>Check In</th>
+          <th>Check Out</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th *ngIf="canEdit" class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rec of records()">
+          <td class="fw-medium">{{ rec.date | date:'mediumDate' }}</td>
+          <td>{{ rec.employeeName || ('EMP-' + rec.employeeId.toString().padStart(4, '0')) }}</td>
+          <td>{{ rec.checkInTime ? rec.checkInTime.slice(0,5) : '-' }}</td>
+          <td>{{ rec.checkOutTime ? rec.checkOutTime.slice(0,5) : '-' }}</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(rec.status)">{{ rec.status }}</span>
+          </td>
+          <td class="small text-truncate" style="max-width:200px; color:#94A3B8;">{{ rec.notes || '-' }}</td>
+          <td *ngIf="canEdit" class="text-end">
+            <button class="btn btn-sm text-primary bg-light me-1" (click)="openEditModal(rec)"><span class="material-symbols-rounded" style="font-size: 18px">edit</span></button>
+            <button class="btn btn-sm text-danger bg-light" (click)="delete(rec.id)"><span class="material-symbols-rounded" style="font-size: 18px">delete</span></button>
+          </td>
+        </tr>
+        
+        <tr *ngIf="records().length === 0">
+          <td [attr.colspan]="canEdit ? 7 : 6" class="text-center py-5">
+            <div class="empty-state p-0">
+              <div class="empty-state-icon"><span class="material-symbols-rounded" style="font-size: 48px">event_available</span></div>
+              <h5>No attendance records</h5>
+              <p class="mb-0">Try changing your filters or add a new record.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-attendance-form 
+  *ngIf="showModal()" 
+  [record]="selectedRecord()" 
+  (close)="closeModal()" 
+  (saved)="onSaved()">
+</app-attendance-form>

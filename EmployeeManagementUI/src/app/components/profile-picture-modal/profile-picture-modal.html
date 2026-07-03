@@ -1,0 +1,63 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden glass-card">
+      <div class="modal-header border-bottom border-light border-opacity-10 py-3">
+        <h5 class="modal-title fw-semibold text-light d-flex align-items-center">
+          <span class="material-symbols-rounded me-2 text-primary">account_circle</span> Update Profile Picture
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="close()"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+
+        <!-- Default State: No Image Selected -->
+        <div *ngIf="!imageChangedEvent" class="mx-auto mb-4 position-relative" style="width: 150px; height: 150px;">
+          <img [src]="fallBackUrl()" alt="Profile Preview"
+               class="rounded-circle shadow border border-3 border-primary w-100 h-100 object-fit-cover">
+          <label class="btn btn-primary rounded-circle position-absolute bottom-0 end-0 p-2 shadow upload-btn" style="cursor:pointer;">
+            <span class="material-symbols-rounded fs-5 d-block">photo_camera</span>
+            <input type="file" class="d-none" accept="image/*" (change)="onFileSelected($event)">
+          </label>
+        </div>
+
+        <p *ngIf="!imageChangedEvent" class="text-secondary small mb-3">Upload an image to open the circular crop editor.</p>
+
+        <div *ngIf="imageChangedEvent" class="mb-4">
+          <div class="bg-dark rounded-3 overflow-hidden shadow-sm border border-secondary border-opacity-25" style="max-height: 350px;">
+            <image-cropper
+              [imageChangedEvent]="imageChangedEvent"
+              [maintainAspectRatio]="true"
+              [aspectRatio]="1 / 1"
+              [resizeToWidth]="400"
+              [roundCropper]="true"
+              format="png"
+              (imageCropped)="imageCropped($event)"
+              style="max-height: 350px;">
+            </image-cropper>
+          </div>
+          <div class="d-flex justify-content-center mt-3">
+            <label class="btn btn-sm btn-outline-info rounded-pill px-3">
+              <span class="material-symbols-rounded align-middle fs-6 me-1">refresh</span> Change Source Image
+              <input type="file" class="d-none" accept="image/*" (change)="onFileSelected($event)">
+            </label>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+          <button class="btn btn-outline-info rounded-pill px-4 d-flex align-items-center" (click)="setDefault('male')" [disabled]="loading()">
+            <span class="material-symbols-rounded me-2">face</span> Male Avatar
+          </button>
+          <button class="btn btn-outline-warning rounded-pill px-4 d-flex align-items-center" (click)="setDefault('female')" [disabled]="loading()">
+            <span class="material-symbols-rounded me-2">face_3</span> Female Avatar
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer border-top border-light border-opacity-10 py-3">
+        <button type="button" class="btn btn-light" (click)="close()" [disabled]="loading()">Cancel</button>
+        <button type="button" class="btn btn-primary d-flex align-items-center px-4" (click)="saveImage()" [disabled]="loading() || !finalBase64Data()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          <span *ngIf="!loading()" class="material-symbols-rounded me-2" style="font-size: 18px">save</span> Save Display Picture
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
