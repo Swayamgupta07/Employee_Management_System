@@ -127,18 +127,18 @@ try
         options.AddPolicy("EmployeeAccess", policy => policy.RequireRole("Employee", "HR", "Admin"));
     });
 
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+                         ?? new[] { 
+                             "http://localhost:3000", "https://localhost:3000",
+                             "http://localhost:3001", "https://localhost:3001",
+                             "http://localhost:4200", "https://localhost:4200" 
+                         };
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowReactApp", policy =>
         {
-            policy.WithOrigins(
-                "http://localhost:3000",
-                "https://localhost:3000",
-                "http://localhost:3001",
-                "https://localhost:3001",
-                "http://localhost:4200",
-                "https://localhost:4200"
-            )
+            policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
