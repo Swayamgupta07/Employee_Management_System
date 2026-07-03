@@ -1,0 +1,92 @@
+<div class="page-header stagger">
+  <div>
+    <h2 class="page-title fade-in-up">Analytics &amp; Trends</h2>
+    <p class="page-subtitle fade-in-up" style="animation-delay: 0.1s">Visualize company performance and growth</p>
+  </div>
+</div>
+
+<!-- Date range filter -->
+<div class="card mb-4 fade-in-up" style="animation-delay: 0.2s">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-control" [(ngModel)]="startDate">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-control" [(ngModel)]="endDate">
+      </div>
+      <div class="col-md-3 d-flex">
+        <button class="btn btn-primary" (click)="loadData()" [disabled]="loading()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          Generate Charts
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 stagger mb-4">
+  <!-- Hiring Trends -->
+  <div class="col-md-6 fade-in-up" style="animation-delay: 0.3s">
+    <div class="chart-container h-100">
+      <h6 class="fw-bold mb-1">Hiring Trends</h6>
+      <p style="font-size:0.75rem;color:#4B5563;margin-bottom:16px">New hires per month in selected range</p>
+      <div *ngIf="noHiring()" class="chart-empty">
+        <span class="material-symbols-rounded">people_search</span>
+        <p>No hiring data for this period</p>
+      </div>
+      <div *ngIf="!noHiring()" style="position:relative;height:280px;width:100%">
+        <canvas #hiringChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Growth -->
+  <div class="col-md-6 fade-in-up" style="animation-delay: 0.35s">
+    <div class="chart-container h-100">
+      <h6 class="fw-bold mb-1">Department Growth</h6>
+      <p style="font-size:0.75rem;color:#4B5563;margin-bottom:16px">Employees hired per department</p>
+      <div *ngIf="noGrowth()" class="chart-empty">
+        <span class="material-symbols-rounded">corporate_fare</span>
+        <p>No department data for this period</p>
+      </div>
+      <div *ngIf="!noGrowth()" style="position:relative;height:280px;width:100%">
+        <canvas #deptGrowthChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 stagger">
+  <!-- Attendance Patterns -->
+  <div class="col-md-6 fade-in-up" style="animation-delay: 0.4s">
+    <div class="chart-container h-100">
+      <h6 class="fw-bold mb-1">Attendance Patterns</h6>
+      <p style="font-size:0.75rem;color:#4B5563;margin-bottom:16px">Present / Late / Absent days per employee</p>
+      <div *ngIf="noAttendance()" class="chart-empty">
+        <span class="material-symbols-rounded">event_available</span>
+        <p>No attendance data for this period</p>
+      </div>
+      <div *ngIf="!noAttendance()" style="position:relative;height:280px;width:100%">
+        <canvas #attendanceChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Metrics -->
+  <div class="col-md-6 fade-in-up" style="animation-delay: 0.45s">
+    <div class="chart-container h-100">
+      <h6 class="fw-bold mb-1">Performance Metrics</h6>
+      <p style="font-size:0.75rem;color:#4B5563;margin-bottom:16px">Attendance &amp; overall score per employee</p>
+      <div *ngIf="noPerf()" class="chart-empty">
+        <span class="material-symbols-rounded">query_stats</span>
+        <p>No performance data for this period</p>
+      </div>
+      <div *ngIf="!noPerf()" style="position:relative;height:280px;width:100%">
+        <canvas #performanceChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,130 @@
+<div class="page-header stagger">
+  <div>
+    <h2 class="page-title fade-in-up">Departments</h2>
+    <p class="page-subtitle fade-in-up" style="animation-delay: 0.1s">Manage organization structure</p>
+  </div>
+  <button *ngIf="canEdit" class="btn btn-primary fade-in-up" style="animation-delay: 0.1s" (click)="openCreateModal()">
+    <span class="fs-5">+</span> Add Department
+  </button>
+</div>
+
+<div *ngIf="loading()" class="spinner-overlay">
+  <div class="spinner-border" role="status"></div>
+</div>
+
+<div *ngIf="!loading()" class="row g-4 stagger">
+  <div class="col-md-4 fade-in-up" *ngFor="let dept of departments(); let i = index" [style.animation-delay]="(i * 0.05) + 's'">
+    <div class="dept-card">
+      <!-- Gradient top bar -->
+      <div class="dept-card-bar" [style.background]="getDeptGradient(i)"></div>
+
+      <div class="dept-card-body">
+        <!-- Icon + actions row -->
+        <div class="dept-card-header">
+          <div class="dept-icon" [style.background]="getDeptGradient(i) + '22'">
+            <span class="material-symbols-rounded" [style.color]="'inherit'">{{ getDepartmentIcon(dept.name) }}</span>
+          </div>
+          <div *ngIf="canEdit" class="dept-actions">
+            <button class="dept-action-btn" (click)="$event.stopPropagation(); openEditModal(dept)" title="Edit">
+              <span class="material-symbols-rounded" style="font-size: 17px">edit</span>
+            </button>
+            <button class="dept-action-btn danger" (click)="$event.stopPropagation(); delete(dept.id)" title="Delete">
+              <span class="material-symbols-rounded" style="font-size: 17px">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Name + description -->
+        <h5 class="dept-name">{{ dept.name }}</h5>
+        <p class="dept-desc">{{ dept.description || 'No description provided.' }}</p>
+
+        <!-- Members row with hover tooltip -->
+        <div class="dept-members-row">
+          <span class="dept-members-label">Team Size</span>
+          <div class="dept-members-pill-wrap">
+            <!-- Tooltip: always present, CSS shows on hover -->
+            <div class="dept-members-tooltip">
+              <div class="dept-tooltip-name">
+                <span class="dept-tooltip-dot"></span>
+                {{ dept.employeeCount || 0 }} employee(s)
+              </div>
+              <div class="dept-tooltip-more">Click to view full list</div>
+            </div>
+            <button class="dept-members-pill" (click)="openMembersPanel(dept)">
+              <span class="material-symbols-rounded" style="font-size:15px">group</span>
+              {{ dept.employeeCount || 0 }} Members
+            </button>
+          </div>
+        </div>
+
+        <!-- View All Members link -->
+        <button class="dept-view-all" (click)="openMembersPanel(dept)">
+          <span class="material-symbols-rounded" style="font-size: 14px">open_in_new</span>
+          View all members
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="departments().length === 0" class="col-12 fade-in-up">
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-state-icon"><span class="material-symbols-rounded" style="font-size: 48px">corporate_fare</span></div>
+        <h5>No departments found</h5>
+        <p>Start by creating a new department.</p>
+        <button *ngIf="canEdit" class="btn btn-primary mt-3" (click)="openCreateModal()">Create Department</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Members Side Panel -->
+<div class="members-panel-backdrop" *ngIf="showMembersPanel()" (click)="closeMembersPanel()"></div>
+<div class="members-panel" [class.open]="showMembersPanel()">
+  <div class="members-panel-header">
+    <div>
+      <h5 class="members-panel-title">
+        <span class="material-symbols-rounded">group</span>
+        {{ membersPanelDept()?.name }} Members
+      </h5>
+      <p class="members-panel-sub">{{ membersList().length }} total employees</p>
+    </div>
+    <button class="members-panel-close" (click)="closeMembersPanel()">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+  </div>
+  <div class="members-panel-body">
+    <div *ngIf="membersLoading()" class="d-flex justify-content-center py-5">
+      <div class="spinner-border spinner-border-sm" style="color:var(--accent-teal)"></div>
+    </div>
+    <div *ngIf="!membersLoading() && membersList().length === 0" class="empty-state py-4">
+      <span class="material-symbols-rounded empty-state-icon">group_off</span>
+      <p>No employees in this department.</p>
+    </div>
+    <div class="members-list" *ngIf="!membersLoading() && membersList().length > 0">
+      <div class="member-row" *ngFor="let emp of membersList()">
+        <div class="member-avatar">
+          <img *ngIf="emp.profilePictureUrl" [src]="emp.profilePictureUrl" alt="" class="w-100 h-100 rounded-circle object-fit-cover">
+          <span *ngIf="!emp.profilePictureUrl">{{ emp.firstName[0] }}</span>
+        </div>
+        <div class="member-info">
+          <div class="member-name">{{ emp.firstName }} {{ emp.lastName }}</div>
+          <div class="member-position">{{ emp.position }}</div>
+          <div class="member-email">{{ emp.email }}</div>
+        </div>
+        <span class="badge" [class.badge-active]="emp.isActive" [class.badge-inactive]="!emp.isActive">
+          {{ emp.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form modal -->
+<app-department-form 
+  *ngIf="showModal()" 
+  [department]="selectedDepartment()" 
+  (close)="closeModal()" 
+  (saved)="onSaved()">
+</app-department-form>

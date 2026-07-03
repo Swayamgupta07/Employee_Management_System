@@ -1,0 +1,111 @@
+<div class="modal fade show d-block" style="background: rgba(0,0,0,0.55); backdrop-filter: blur(4px)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content fade-in-up">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ record ? 'Edit' : 'Log' }} Attendance</h5>
+        <button type="button" class="btn-close" (click)="close.emit()" [disabled]="loading()"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div *ngIf="error()" class="alert alert-danger mb-4">{{ error() }}</div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row g-3">
+
+            <!-- Employee ID — custom stepper (min 1, no negatives) -->
+            <div class="col-12">
+              <label class="form-label">Employee ID *</label>
+              <div class="emp-stepper" [class.border-danger]="form.controls.employeeId.touched && form.controls.employeeId.invalid">
+                <button type="button" class="stepper-btn"
+                        (click)="stepDown()"
+                        [disabled]="form.controls.employeeId.disabled || (form.get('employeeId')!.value ?? 1) <= 1">
+                  &#8722;
+                </button>
+                <input type="number" formControlName="employeeId" min="1"
+                       (input)="onEmpIdInput($event)"
+                       placeholder="1">
+                <button type="button" class="stepper-btn"
+                        (click)="stepUp()"
+                        [disabled]="form.controls.employeeId.disabled">
+                  &#43;
+                </button>
+              </div>
+              <small class="text-danger"
+                     *ngIf="form.controls.employeeId.touched && form.controls.employeeId.invalid">
+                Please enter a valid Employee ID (≥ 1)
+              </small>
+            </div>
+
+            <!-- Date + Status -->
+            <div class="col-md-6">
+              <label class="form-label">Date *</label>
+              <input type="date" class="form-control" formControlName="date">
+              <small class="text-danger"
+                     *ngIf="form.controls.date.touched && form.controls.date.invalid">Required</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Status *</label>
+              <select class="form-select" formControlName="status">
+                <option value="Present">Present</option>
+                <option value="Late">Late</option>
+                <option value="Absent">Absent</option>
+                <option value="Half-Day">Half-Day</option>
+              </select>
+            </div>
+
+            <!-- Check-In / Check-Out — hidden when Absent -->
+            <div class="col-12" [class.time-section]="true" [class.absent]="isAbsent">
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    Check-In Time
+                    <span *ngIf="!isAbsent" style="color:#EF4444">*</span>
+                    <span *ngIf="isAbsent"  style="color:#4B5563;font-size:0.72rem"> (N/A for Absent)</span>
+                  </label>
+                  <input type="time" class="form-control" formControlName="checkInTime"
+                         [attr.disabled]="isAbsent ? true : null">
+                  <small class="text-danger"
+                         *ngIf="!isAbsent && form.controls.checkInTime.touched && form.controls.checkInTime.invalid">
+                    Required
+                  </small>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">
+                    Check-Out Time
+                    <span *ngIf="!isAbsent" style="color:#EF4444">*</span>
+                    <span *ngIf="isAbsent"  style="color:#4B5563;font-size:0.72rem"> (N/A for Absent)</span>
+                  </label>
+                  <input type="time" class="form-control" formControlName="checkOutTime"
+                         [attr.disabled]="isAbsent ? true : null">
+                  <small class="text-danger"
+                         *ngIf="!isAbsent && form.controls.checkOutTime.touched && form.controls.checkOutTime.invalid">
+                    Required
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" formControlName="notes" rows="2"
+                        placeholder="Any additional info?"></textarea>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" (click)="close.emit()" [disabled]="loading()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="loading()">
+          <span *ngIf="loading()" class="spinner-border spinner-border-sm me-2"></span>
+          {{ record ? 'Update' : 'Save' }} Record
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

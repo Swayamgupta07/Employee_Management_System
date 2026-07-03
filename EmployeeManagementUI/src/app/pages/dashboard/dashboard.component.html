@@ -1,0 +1,219 @@
+<!-- Loading state -->
+<div *ngIf="loading()" class="d-flex flex-column gap-3">
+  <div class="row g-4 mb-2">
+    <div class="col-md-3" *ngFor="let i of [1,2,3,4]">
+      <div class="stat-card" style="height:130px;"><div class="skeleton" style="height:100%;border-radius:12px;background:var(--bg-raised)"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard content -->
+<div *ngIf="!loading()">
+
+  <!-- Page Header -->
+  <div class="page-header mb-4">
+    <div>
+      <h2 class="page-title">Dashboard Overview</h2>
+      <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+    </div>
+  </div>
+
+  <!-- ===== ROW 1: KPI Cards ===== -->
+  <div class="row g-4 mb-4 stagger">
+
+    <!-- Total Employees -->
+    <div class="col-xl-3 col-md-6 fade-in-up">
+      <div class="stat-card primary">
+        <div class="stat-icon primary">
+          <span class="material-symbols-rounded">groups</span>
+        </div>
+        <div class="stat-value">{{ totalEmployees() }}</div>
+        <div class="stat-label">Total Employees</div>
+        <div class="stat-trend up">
+          <span class="material-symbols-rounded" style="font-size:14px">trending_up</span>
+          All departments combined
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Employees -->
+    <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay:0.07s">
+      <div class="stat-card success">
+        <div class="stat-icon success">
+          <span class="material-symbols-rounded">person_check</span>
+        </div>
+        <div class="stat-value">{{ activeEmployees() }}</div>
+        <div class="stat-label">Active Employees</div>
+        <div class="stat-trend up">
+          <span class="material-symbols-rounded" style="font-size:14px">check_circle</span>
+          Currently working
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments -->
+    <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay:0.14s">
+      <div class="stat-card warning">
+        <div class="stat-icon warning">
+          <span class="material-symbols-rounded">corporate_fare</span>
+        </div>
+        <div class="stat-value">{{ totalDepartments() }}</div>
+        <div class="stat-label">Departments</div>
+        <div class="stat-trend neutral">
+          <span class="material-symbols-rounded" style="font-size:14px">domain</span>
+          Across organization
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Approvals — Admin only -->
+    <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay:0.21s" *ngIf="isAdmin">
+      <div class="stat-card info" style="cursor:pointer" routerLink="/approvals">
+        <div class="stat-icon info">
+          <span class="material-symbols-rounded">pending_actions</span>
+        </div>
+        <div class="stat-value">{{ pendingCount() }}</div>
+        <div class="stat-label">Pending Approvals</div>
+        <div class="stat-trend" [class.up]="pendingCount() > 0" [class.neutral]="pendingCount() === 0">
+          <span class="material-symbols-rounded" style="font-size:14px">pending</span>
+          {{ pendingCount() > 0 ? 'Action required' : 'All clear' }}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROW 2: Charts ===== -->
+  <div class="row g-4 mb-4">
+
+    <!-- Attendance Line Chart -->
+    <div class="col-xl-7 fade-in-up" style="animation-delay:0.25s">
+      <div class="chart-card h-100">
+        <div class="chart-card-header">
+          <div>
+            <h5 class="chart-card-title">Attendance Overview</h5>
+            <p class="chart-card-subtitle">Daily attendance percentage trend</p>
+          </div>
+          <div class="range-chips">
+            <button class="chip" [class.active]="activeRange()==='7D'"  (click)="setRange('7D')">7D</button>
+            <button class="chip" [class.active]="activeRange()==='30D'" (click)="setRange('30D')">30D</button>
+            <button class="chip" [class.active]="activeRange()==='90D'" (click)="setRange('90D')">90D</button>
+          </div>
+        </div>
+        <div style="height: 260px; position: relative;">
+          <canvas baseChart
+            [data]="attendanceChartData"
+            [type]="'line'"
+            [options]="attendanceChartOptions">
+          </canvas>
+        </div>
+        <div class="chart-summary">
+          <div class="chart-summary-item">
+            <span class="material-symbols-rounded text-success" style="font-size:16px">trending_up</span>
+            <span>Average this period: <strong>87%</strong></span>
+          </div>
+          <div class="chart-summary-item">
+            <span class="material-symbols-rounded" style="font-size:16px;color:var(--accent-teal)">star</span>
+            <span>Benchmark: <strong>85%</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Donut Chart -->
+    <div class="col-xl-5 fade-in-up" style="animation-delay:0.3s">
+      <div class="chart-card h-100">
+        <div class="chart-card-header">
+          <div>
+            <h5 class="chart-card-title">Department Headcount</h5>
+            <p class="chart-card-subtitle">Employee distribution by department</p>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-4">
+          <div style="width: 180px; height: 180px; position: relative; flex-shrink: 0;">
+            <canvas baseChart
+              [data]="deptChartData"
+              [type]="'doughnut'"
+              [options]="deptChartOptions">
+            </canvas>
+            <div class="donut-center-label">
+              <div class="donut-center-value">{{ deptTotal }}</div>
+              <div class="donut-center-sub">Total</div>
+            </div>
+          </div>
+          <!-- Legend -->
+          <div class="dept-legend" *ngIf="departments().length">
+            <div class="dept-legend-item" *ngFor="let dept of departments(); let i = index">
+              <span class="dept-legend-dot" [style.background]="deptColors[i] || '#fff'"></span>
+              <span class="dept-legend-name">{{ dept.name }}</span>
+              <span class="dept-legend-count">{{ dept.employeeCount || 0 }}</span>
+            </div>
+            <div *ngIf="!departments().length" class="empty-state py-3">
+              <p style="font-size:0.8rem">No departments found</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROW 3: Employee Table ===== -->
+  <div class="row g-4 fade-in-up" style="animation-delay:0.35s">
+    <div class="col-12">
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <h5 class="mb-0 fw-bold">Recent Employees</h5>
+            <p class="mb-0" style="font-size:0.78rem;color:var(--text-muted);margin-top:2px">Latest additions to the system</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Position</th>
+                <th>Department</th>
+                <th>Joined Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of recentEmployees()">
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="emp-avatar">{{ emp.firstName[0] }}</div>
+                    <div>
+                      <div class="fw-semibold" style="color:var(--text-primary);font-size:0.875rem">{{ emp.firstName }} {{ emp.lastName }}</div>
+                      <div style="font-size:0.75rem;color:var(--text-muted)">{{ emp.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="color:var(--text-secondary)">{{ emp.position }}</td>
+                <td>
+                  <span class="badge badge-dept">{{ emp.departmentName || 'N/A' }}</span>
+                </td>
+                <td style="color:var(--text-secondary)">{{ emp.hireDate | date:'mediumDate' }}</td>
+                <td>
+                  <span class="badge" [class.badge-active]="emp.isActive" [class.badge-inactive]="!emp.isActive">
+                    {{ emp.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="recentEmployees().length === 0">
+                <td colspan="5">
+                  <div class="empty-state py-5">
+                    <span class="material-symbols-rounded empty-state-icon">group_off</span>
+                    <h5>No employees found</h5>
+                    <p>Add employees to see them here.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

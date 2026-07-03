@@ -1,0 +1,34 @@
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <span class="material-symbols-rounded" style="font-size: 22px; color:#fff;">bolt</span>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">Employee Manager</span>
+      <span class="logo-sub">HRMS Dashboard</span>
+    </div>
+  </div>
+
+  <!-- Navigation Groups -->
+  <nav class="sidebar-nav">
+    @for (group of getVisibleGroups(); track group.label) {
+      <span class="nav-section-label">{{ group.label }}</span>
+      @for (item of group.items; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="nav-icon material-symbols-rounded">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+          <span class="nav-badge" *ngIf="item.badge && item.badge()"></span>
+        </a>
+      }
+    }
+  </nav>
+
+  <!-- Footer: version only, no logout (logout is in header dropdown) -->
+  <div class="sidebar-footer">
+    <div class="sidebar-version">v1.0.0</div>
+  </div>
+</aside>

@@ -1,0 +1,22 @@
+# Angular
+/EmployeeManagementUI/node_modules/
+/EmployeeManagementUI/.angular/
+/EmployeeManagementUI/dist/
+/EmployeeManagementUI/.vscode/
+/EmployeeManagementUI/.idea/
+
+# .NET Core
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+**/logs/
+**/error_log.txt
+**/build.log
+**/libwkhtmltox.dll
+appsettings.Development.json
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
