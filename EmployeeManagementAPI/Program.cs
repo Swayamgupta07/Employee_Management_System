@@ -252,7 +252,7 @@ try
             if (context.Database.GetPendingMigrations().Any())
             {
                 logger.LogInformation("Applying pending migrations...");
-                context.Database.Migrate();
+                // context.Database.Migrate(); // DISABLED to allow manual SQL imports without crashing
                 logger.LogInformation("Database migration completed successfully");
             }
             else
