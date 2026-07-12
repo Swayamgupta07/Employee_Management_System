@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://employeemanagementswayam.somee.com/api'
+  apiUrl: 'https://employee-management-system-swayam.vercel.app/api'
 };
