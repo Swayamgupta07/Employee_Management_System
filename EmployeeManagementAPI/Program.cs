@@ -243,15 +243,13 @@ try
             if (context.Database.GetPendingMigrations().Any())
             {
                 logger.LogInformation("Applying pending migrations...");
-                // context.Database.Migrate(); // DISABLED to allow manual SQL imports without crashing
+                context.Database.Migrate();
                 logger.LogInformation("Database migration completed successfully");
             }
             else
             {
                 logger.LogInformation("Database is up to date - no migrations needed");
             }
-
-            context.Database.EnsureCreated();
             
             logger.LogInformation("Database initialization completed successfully");
         }

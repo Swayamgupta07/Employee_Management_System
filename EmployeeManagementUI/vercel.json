@@ -5,6 +5,10 @@
       "destination": "http://employeemanagementswayam.somee.com/api/$1"
     },
     {
+      "source": "/uploads/(.*)",
+      "destination": "http://employeemanagementswayam.somee.com/uploads/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
