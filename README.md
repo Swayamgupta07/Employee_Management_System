@@ -1,10 +1,10 @@
-# 🚀 Employee Management System (HRMS)
+# 🏢 Employee Management System (HRMS)
 
 A comprehensive, full-stack Human Resource Management System built to streamline employee data, attendance tracking, department management, and administrative workflows. 
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)
-![Angular](https://img.shields.io/badge/Angular-18-DD0031?logo=angular)
+![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql)
 ![Deployment](https://img.shields.io/badge/Live-Vercel%20%7C%20Somee-success)
 
@@ -18,7 +18,7 @@ A comprehensive, full-stack Human Resource Management System built to streamline
 ## 🛠️ Technology Stack
 
 ### **Frontend**
-- **Framework:** Angular 18
+- **Framework:** Angular 20
 - **Styling:** Tailwind CSS + Vanilla CSS (Dynamic UI, Glassmorphism, Micro-animations)
 - **State Management & Routing:** RxJS, Angular Router
 - **Hosting:** Vercel (with custom proxy configuration for API and Image uploads)
