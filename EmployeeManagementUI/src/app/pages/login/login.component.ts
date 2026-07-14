@@ -66,9 +66,6 @@ export class LoginComponent {
       error: (err) => {
         const msg = err?.error?.message || '';
         if (msg.toLowerCase().includes('verify your email')) {
-           // Extract email if possible or just rely on user knowing it. 
-           // For better UX, we'd need email in LoginDto or the error response.
-           // For now, if they used email as username, we use that.
            const identifier = this.form.value.username || '';
            if (identifier) {
              localStorage.setItem('pending_verify_email', identifier);

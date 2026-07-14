@@ -30,9 +30,6 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
     
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-    
     builder.Host.UseSerilog();
 
     builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
@@ -199,19 +196,13 @@ try
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API V1");
-            options.RoutePrefix = string.Empty;
-        });
-    }
-    else
-    {
-        app.UseHsts();
-    }
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API V1");
+        options.RoutePrefix = string.Empty;
+    });
 
     // Global Error Handling Middleware (must be first)
     app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -268,7 +259,7 @@ try
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while migrating or seeding the database");
-            throw;
+            // throw; // Do not throw so the app doesn't crash completely
         }
     }
 

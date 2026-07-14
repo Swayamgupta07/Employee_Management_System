@@ -42,6 +42,15 @@ namespace EmployeeManagementAPI.Data
             UserSeeder.Seed(modelBuilder);
             EmployeeSeeder.Seed(modelBuilder);
             AttendanceSeeder.Seed(modelBuilder);
+            
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                var currentTableName = entity.GetTableName();
+                if (!string.IsNullOrEmpty(currentTableName))
+                {
+                    entity.SetTableName(currentTableName.ToLowerInvariant());
+                }
+            }
         }
     }
 }
