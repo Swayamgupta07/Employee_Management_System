@@ -4,6 +4,7 @@
 /EmployeeManagementUI/dist/
 /EmployeeManagementUI/.vscode/
 /EmployeeManagementUI/.idea/
+/EmployeeManagementUI/package-lock.json
 
 # .NET Core
 **/bin/
